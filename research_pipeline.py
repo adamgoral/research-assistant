@@ -302,13 +302,36 @@ class ContentRetriever:
         return web_content
 
 
+# Import real InformationExtractor implementation
+try:
+    from information_extraction import InformationExtractor as RealInformationExtractor
+    from information_extraction import InformationSynthesizer
+    REAL_EXTRACTION_AVAILABLE = True
+except ImportError:
+    REAL_EXTRACTION_AVAILABLE = False
+    logging.getLogger("research_pipeline").warning(
+        "Real information extraction functionality not available. Using mock implementation instead."
+    )
+
+
 class InformationExtractor:
     """
     Extracts relevant information from retrieved content.
     
-    In a production implementation, this would use GPT-4o to analyze content
-    and extract relevant information.
+    This class provides a fallback mock implementation when the real
+    LLM-based extractor is not available.
     """
+    
+    def __init__(self):
+        """Initialize the mock extractor."""
+        # Try to use the real implementation if available
+        self.real_extractor = None
+        if REAL_EXTRACTION_AVAILABLE:
+            try:
+                self.real_extractor = RealInformationExtractor()
+                logger.info("Using real LLM-based information extraction")
+            except Exception as e:
+                logger.warning(f"Failed to initialize real extractor: {str(e)}")
     
     async def extract_information(
         self, content: WebContent, topic: ResearchTopic
@@ -323,11 +346,19 @@ class InformationExtractor:
         Returns:
             A list of ExtractedInformation objects
         """
-        logger.info(f"Extracting information from content: {content.url}")
+        # Use real extractor if available
+        if self.real_extractor:
+            try:
+                return await self.real_extractor.extract_information(
+                    content, topic, extraction_types=["facts", "claims", "summary"]
+                )
+            except Exception as e:
+                logger.error(f"Real extraction failed, falling back to mock: {str(e)}")
+                # Fall through to mock implementation
         
-        # In a real implementation, this would use GPT-4o to analyze the content
-        # For this PoC, we'll generate mock extracted information
+        logger.info(f"Using mock extraction for content: {content.url}")
         
+        # Mock implementation begins here
         # Split content into paragraphs
         paragraphs = [p.strip() for p in content.content.split("\n\n") if p.strip()]
         
@@ -355,6 +386,7 @@ class InformationExtractor:
                     source_title=content.title,
                     relevance_score=relevance_score,
                     metadata={
+                        "type": "mock_extraction",
                         "paragraph_index": i,
                         "word_count": len(paragraph.split()),
                         "domain": content.metadata["domain"],

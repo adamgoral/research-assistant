@@ -73,7 +73,7 @@ The Web Research Assistant & Report Writer project is currently in the **design 
 
 ### Medium-term (1-2 Months)
 1. ✅ Develop source evaluation capabilities
-2. ⬜ Implement information extraction and synthesis
+2. ✅ Implement information extraction and synthesis
 3. ⬜ Create report generation module
 4. ⬜ Integrate citation and reference management
 5. ⬜ Implement basic UI for research requests
