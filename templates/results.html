@@ -1,0 +1,157 @@
+{% extends "base.html" %}
+
+{% block title %}Research Results{% endblock %}
+
+{% block content %}
+<section class="research-form">
+  <h2>Research Results</h2>
+  <p>Research on "{{ job.topic.title }}" has been completed.</p>
+  
+  <div class="research-parameters">
+    <h3>Research Parameters</h3>
+    <ul>
+      <li><strong>Audience:</strong> {{ job.parameters.audience|title }}</li>
+      <li><strong>Depth:</strong> {{ job.parameters.depth|title }}</li>
+      <li><strong>Format:</strong> {{ job.parameters.format|title }}</li>
+      <li><strong>Time Constraint:</strong> {{ job.parameters.time_constraint }} minutes</li>
+    </ul>
+  </div>
+</section>
+
+<section class="results-view">
+  <h3>Research Sources</h3>
+  <p>Top sources related to "{{ job.topic.title }}"</p>
+  
+  <div class="source-list">
+    {% for source in results.results.sources[:5] %}
+      <div class="source-item">
+        <div class="source-rating">
+          <div class="rating-value">{{ (source.evaluation.relevance_score * 100) | int }}</div>
+          <div class="rating-label">Relevance</div>
+        </div>
+        
+        <div class="source-content">
+          <h4>{{ source.title }}</h4>
+          <a href="{{ source.url }}" target="_blank" class="source-url">{{ source.url }}</a>
+          
+          {% if source.information %}
+            <p class="source-snippet">
+              {{ source.information[0].text[:200] }}...
+            </p>
+          {% endif %}
+          
+          <div class="source-meta">
+            {% if source.evaluation.evaluation_factors.domain_type %}
+              <span>{{ source.evaluation.evaluation_factors.domain_type|title }}</span>
+            {% endif %}
+          </div>
+          
+          <div>
+            {% if source.evaluation.credibility == "high" %}
+              <span class="badge badge-green">High Credibility</span>
+            {% elif source.evaluation.credibility == "medium" %}
+              <span class="badge badge-blue">Medium Credibility</span>
+            {% elif source.evaluation.credibility == "low" %}
+              <span class="badge badge-orange">Low Credibility</span>
+            {% endif %}
+            
+            {% if source.evaluation.evaluation_factors.has_references %}
+              <span class="badge badge-blue">References</span>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    {% else %}
+      <div class="source-item">
+        <p>No sources found for this research topic.</p>
+      </div>
+    {% endfor %}
+  </div>
+</section>
+
+<section class="report-container">
+  <div class="report-header">
+    <h2>{{ job.topic.title }}</h2>
+    <div class="report-metadata">
+      <div>Generated: {{ results.completion_time|datetime }}</div>
+      <div>Research Depth: {{ job.parameters.depth|title }}</div>
+      <div>Sources: {{ results.results.sources|length }}</div>
+    </div>
+  </div>
+  
+  <div class="report-section">
+    <h3>Executive Summary</h3>
+    <p>
+      This report provides a comprehensive overview of "{{ job.topic.title }}" based on research 
+      from {{ results.results.sources|length }} sources. The analysis explores key aspects of the topic,
+      including major findings, trends, and expert opinions.
+    </p>
+  </div>
+  
+  <div class="report-section">
+    <h3>Key Findings</h3>
+    <p>The research identified several important findings related to this topic:</p>
+    <ol>
+      {% for source in results.results.sources[:3] %}
+        {% if source.information %}
+          <li>
+            <strong>{{ source.information[0].text.split('.')[0] }}.</strong>
+            <div class="source-citation">[Source: {{ source.title }}]</div>
+          </li>
+        {% endif %}
+      {% else %}
+        <li>No key findings available for this research topic.</li>
+      {% endfor %}
+    </ol>
+  </div>
+  
+  <div class="export-options">
+    <button>Download Full Report (PDF)</button>
+    <button class="btn-secondary">Export as Word</button>
+    <button class="btn-secondary">Share Report</button>
+  </div>
+  
+  <div class="feedback-form">
+    <h3>Report Feedback</h3>
+    <p>How would you rate the quality of this report?</p>
+    
+    <form id="feedback-form" action="{{ url_for('report_feedback') }}" method="POST">
+      <input type="hidden" name="job_id" value="{{ job.topic.id }}">
+      <input type="hidden" name="rating" id="rating-input" value="0">
+      
+      <div class="rating-stars">
+        <svg class="star" viewBox="0 0 24 24">
+          <path d="M12,17.27L18.18,21L16.54,13.97L22,9.24L14.81,8.62L12,2L9.19,8.62L2,9.24L7.45,13.97L5.82,21L12,17.27Z" />
+        </svg>
+        <svg class="star" viewBox="0 0 24 24">
+          <path d="M12,17.27L18.18,21L16.54,13.97L22,9.24L14.81,8.62L12,2L9.19,8.62L2,9.24L7.45,13.97L5.82,21L12,17.27Z" />
+        </svg>
+        <svg class="star" viewBox="0 0 24 24">
+          <path d="M12,17.27L18.18,21L16.54,13.97L22,9.24L14.81,8.62L12,2L9.19,8.62L2,9.24L7.45,13.97L5.82,21L12,17.27Z" />
+        </svg>
+        <svg class="star" viewBox="0 0 24 24">
+          <path d="M12,17.27L18.18,21L16.54,13.97L22,9.24L14.81,8.62L12,2L9.19,8.62L2,9.24L7.45,13.97L5.82,21L12,17.27Z" />
+        </svg>
+        <svg class="star" viewBox="0 0 24 24">
+          <path d="M12,17.27L18.18,21L16.54,13.97L22,9.24L14.81,8.62L12,2L9.19,8.62L2,9.24L7.45,13.97L5.82,21L12,17.27Z" />
+        </svg>
+      </div>
+      
+      <div>
+        <label for="feedback-comments">Additional Feedback</label>
+        <textarea id="feedback-comments" name="comments" placeholder="Please share any specific feedback to improve our research..."></textarea>
+      </div>
+      
+      <button type="submit">Submit Feedback</button>
+    </form>
+  </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    submitFeedback('feedback-form');
+  });
+</script>
+{% endblock %}

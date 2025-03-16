@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block title %}Active Research{% endblock %}
+
+{% block content %}
+<section class="research-form">
+  <h2>Active Research</h2>
+  
+  {% if jobs %}
+    <p>Currently ongoing research tasks:</p>
+    
+    <div class="jobs-list">
+      {% for job_id, job in jobs.items() %}
+        <div class="job-card">
+          <div class="job-header">
+            <div class="job-title">{{ job.topic.title }}</div>
+            <div class="job-status status-{{ job.status }}">{{ job.status|title }}</div>
+          </div>
+          
+          <div class="job-parameters">
+            <div>Audience: {{ job.parameters.audience|title }}</div>
+            <div>Depth: {{ job.parameters.depth|title }}</div>
+            <div>Format: {{ job.parameters.format|title }}</div>
+            <div>Submitted: {{ job.submit_time|datetime }}</div>
+          </div>
+          
+          <div class="job-actions">
+            <a href="{{ url_for('view_progress', job_id=job_id) }}" class="btn-secondary">View Progress</a>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <p>No active research tasks at the moment.</p>
+    <p>
+      <a href="{{ url_for('index') }}" class="btn-secondary">Start New Research</a>
+    </p>
+  {% endif %}
+</section>
+{% endblock %}

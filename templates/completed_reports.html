@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+
+{% block title %}Completed Reports{% endblock %}
+
+{% block content %}
+<section class="research-form">
+  <h2>Completed Reports</h2>
+  
+  {% if reports %}
+    <p>Your completed research reports:</p>
+    
+    <div class="jobs-list">
+      {% for report in reports %}
+        <div class="job-card">
+          <div class="job-header">
+            <div class="job-title">{{ report.title }}</div>
+            <div class="job-status status-completed">Completed</div>
+          </div>
+          
+          <div class="job-parameters">
+            <div>Type: {{ report.report_type }}</div>
+            <div>Completed: {{ report.timestamp|datetime }}</div>
+          </div>
+          
+          <div class="job-actions">
+            <a href="{{ url_for('view_results', job_id=report.job_id) }}" class="btn-secondary">View Report</a>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <p>No completed reports yet.</p>
+    <p>
+      <a href="{{ url_for('index') }}" class="btn-secondary">Start New Research</a>
+    </p>
+  {% endif %}
+</section>
+{% endblock %}

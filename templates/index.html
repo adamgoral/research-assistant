@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+
+{% block title %}Research Assistant - New Research{% endblock %}
+
+{% block content %}
+<div class="dashboard">
+  <div>
+    <section class="research-form">
+      <h2>Research Request</h2>
+      <form action="{{ url_for('submit_research') }}" method="POST">
+        <div>
+          <label for="research-topic">Research Topic or Question</label>
+          <textarea id="research-topic" name="research_topic" placeholder="Enter a specific research topic or question..."></textarea>
+        </div>
+        
+        <div class="parameters">
+          <div>
+            <label for="audience">Target Audience</label>
+            <select id="audience" name="audience">
+              <option value="general">General Audience</option>
+              <option value="academic">Academic</option>
+              <option value="professional">Professional</option>
+              <option value="technical">Technical</option>
+            </select>
+          </div>
+          
+          <div>
+            <label for="depth">Research Depth</label>
+            <select id="depth" name="depth">
+              <option value="brief">Brief Overview</option>
+              <option value="standard" selected>Standard</option>
+              <option value="comprehensive">Comprehensive</option>
+              <option value="expert">Expert Analysis</option>
+            </select>
+          </div>
+          
+          <div>
+            <label for="report-format">Report Format</label>
+            <select id="report-format" name="format">
+              <option value="summary">Executive Summary</option>
+              <option value="report" selected>Standard Report</option>
+              <option value="analysis">Analytical Report</option>
+              <option value="presentation">Presentation</option>
+            </select>
+          </div>
+          
+          <div>
+            <label for="time-constraint">Time Constraint</label>
+            <select id="time-constraint" name="time">
+              <option value="15">Quick (15 min)</option>
+              <option value="30" selected>Standard (30 min)</option>
+              <option value="60">Thorough (1 hour)</option>
+              <option value="120">Comprehensive (2 hours)</option>
+            </select>
+          </div>
+        </div>
+        
+        <button type="submit">Start Research</button>
+      </form>
+    </section>
+  </div>
+  
+  <div>
+    <section class="recent-reports">
+      <h3>Recent Reports</h3>
+      
+      {% if recent_reports %}
+        {% for report in recent_reports %}
+          <div class="report-item">
+            <div class="report-title">
+              <a href="{{ url_for('view_results', job_id=report.job_id) }}">{{ report.title }}</a>
+            </div>
+            <div class="report-meta">
+              {{ report.timestamp|datetime }} · {{ report.report_type }}
+            </div>
+          </div>
+        {% endfor %}
+      {% else %}
+        <div class="report-item">
+          <div class="report-title">No reports yet</div>
+          <div class="report-meta">Submit a research request to get started</div>
+        </div>
+      {% endif %}
+    </section>
+  </div>
+</div>
+{% endblock %}

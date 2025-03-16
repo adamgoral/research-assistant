@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+
+{% block title %}Research Progress{% endblock %}
+
+{% block content %}
+<section class="research-form">
+  <h2>Research in Progress</h2>
+  <p>Your research on "{{ job.topic.title }}" is being processed.</p>
+  
+  <div class="progress-container" data-job-id="{{ job.topic.id }}">
+    <div class="status-indicator">
+      <span>Status: {{ job.status|title }}</span>
+    </div>
+    
+    <div class="progress-bar">
+      <div class="progress-fill" style="width: {{ progress }}%;"></div>
+    </div>
+    
+    <div class="progress-status">
+      <span>{{ progress }}% Complete</span>
+      <span>Est. completion: {{ remaining }}</span>
+    </div>
+    
+    <div class="status-indicator {% if progress <= 20 %}active{% endif %}">
+      <span>Planning</span>
+    </div>
+    
+    <div class="status-indicator {% if progress > 20 and progress <= 40 %}active{% endif %}">
+      <span>Searching</span>
+    </div>
+    
+    <div class="status-indicator {% if progress > 40 and progress <= 60 %}active{% endif %}">
+      <span>Analyzing</span>
+    </div>
+    
+    <div class="status-indicator {% if progress > 60 and progress <= 80 %}active{% endif %}">
+      <span>Synthesizing</span>
+    </div>
+    
+    <div class="status-indicator {% if progress > 80 %}active{% endif %}">
+      <span>Report Generation</span>
+    </div>
+  </div>
+  
+  <div class="research-parameters">
+    <h3>Research Parameters</h3>
+    <ul>
+      <li><strong>Audience:</strong> {{ job.parameters.audience|title }}</li>
+      <li><strong>Depth:</strong> {{ job.parameters.depth|title }}</li>
+      <li><strong>Format:</strong> {{ job.parameters.format|title }}</li>
+      <li><strong>Time Constraint:</strong> {{ job.parameters.time_constraint }} minutes</li>
+    </ul>
+  </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Auto-refresh the page if not polling via AJAX
+    setTimeout(function() {
+      if (typeof pollJobStatus !== 'function') {
+        location.reload();
+      }
+    }, 10000);
+  });
+</script>
+{% endblock %}
