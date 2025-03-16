@@ -10,10 +10,15 @@ import asyncio
 import os
 import json
 import uuid
+import logging
 from datetime import datetime
 from typing import Dict, List, Optional, Any
 
 from flask import Flask, render_template, request, jsonify, redirect, url_for
+
+# Import progress monitoring system
+from progress_monitor import ProgressMonitor, ResearchPhase, ProgressMonitorRegistry
+from progress_api import progress_bp, create_progress_monitor, update_research_phase, update_research_progress
 
 # Import from research pipeline
 from research_pipeline import (
@@ -22,8 +27,18 @@ from research_pipeline import (
     SearchQuery
 )
 
+# Configure logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+)
+logger = logging.getLogger(__name__)
+
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'dev_key_for_research_assistant')
+
+# Register the progress_bp blueprint
+app.register_blueprint(progress_bp)
 
 # In-memory storage for research jobs and results
 # In a production app, this would be a database
@@ -106,15 +121,89 @@ async def _run_research(job_id: str, topic: ResearchTopic, max_depth: int):
         RESEARCH_JOBS[job_id]['status'] = 'running'
         RESEARCH_JOBS[job_id]['start_time'] = datetime.now()
         
+        # Update progress - Planning phase
+        update_research_phase(
+            job_id,
+            ResearchPhase.PLANNING,
+            f"Planning research for '{topic.title}'"
+        )
+        
+        # Planning phase
+        update_research_progress(job_id, 10, "Analyzing research question")
+        await asyncio.sleep(1)  # Simulate work
+        
+        update_research_progress(job_id, 15, "Identifying key aspects")
+        await asyncio.sleep(1)  # Simulate work
+        
+        # Extract subtopics from keywords
+        subtopics = topic.keywords[:5] if topic.keywords else ["General research"]
+        update_research_progress(
+            job_id, 
+            20, 
+            "Finalized research plan", 
+            {"subtopics": subtopics}
+        )
+        
+        # Update progress - Searching phase
+        update_research_phase(
+            job_id,
+            ResearchPhase.SEARCHING,
+            "Searching for sources"
+        )
+        
         # Run the research
         stats = await pipeline.research_topic(
             topic,
             max_queries=max_depth,
-            max_results_per_query=max_depth
+            max_results_per_query=max_depth,
+            progress_callback=lambda progress, message, details=None: 
+                update_research_progress(job_id, 25 + (progress * 0.15), message, details)
+        )
+        
+        # Update progress - Analyzing phase
+        update_research_phase(
+            job_id,
+            ResearchPhase.ANALYZING,
+            "Analyzing sources"
         )
         
         # Get the research results
-        results = await pipeline.get_research_results(topic.id)
+        results = await pipeline.get_research_results(
+            topic.id,
+            progress_callback=lambda progress, message, details=None: 
+                update_research_progress(job_id, 45 + (progress * 0.15), message, details)
+        )
+        
+        # Update progress - Synthesizing phase
+        update_research_phase(
+            job_id,
+            ResearchPhase.SYNTHESIZING,
+            "Synthesizing information"
+        )
+        
+        # Synthesis phase
+        for i, subtopic in enumerate(subtopics):
+            progress = 65 + (i * 4)
+            update_research_progress(job_id, progress, f"Synthesizing information for {subtopic}")
+            await asyncio.sleep(0.5)  # Simulate work
+            
+        update_research_progress(job_id, 80, "Completed information synthesis")
+        
+        # Update progress - Report Generation phase
+        update_research_phase(
+            job_id,
+            ResearchPhase.GENERATING,
+            "Generating report"
+        )
+        
+        # Report generation phase
+        sections = ["Introduction", "Methodology", "Findings", "Discussion", "Conclusion"]
+        for i, section in enumerate(sections):
+            progress = 82 + (i * 2)
+            update_research_progress(job_id, progress, f"Generating {section} section")
+            await asyncio.sleep(0.5)  # Simulate work
+            
+        update_research_progress(job_id, 95, "Formatting citations and references")
         
         # Store results
         RESEARCH_RESULTS[job_id] = {
@@ -123,6 +212,20 @@ async def _run_research(job_id: str, topic: ResearchTopic, max_depth: int):
             'topic': topic.dict(),
             'completion_time': datetime.now()
         }
+        
+        # Save progress data to a file
+        monitor = ProgressMonitorRegistry.get(job_id)
+        if monitor:
+            os.makedirs("output", exist_ok=True)
+            progress_path = os.path.join("output", f"progress_{job_id}.json")
+            monitor.save_to_file(progress_path)
+            
+        # Update progress - Completed phase
+        update_research_phase(
+            job_id,
+            ResearchPhase.COMPLETED,
+            "Research completed successfully"
+        )
         
         # Update job status
         RESEARCH_JOBS[job_id]['status'] = 'completed'
@@ -141,6 +244,13 @@ async def _run_research(job_id: str, topic: ResearchTopic, max_depth: int):
             RECENT_REPORTS.pop()
             
     except Exception as e:
+        logger.error(f"Error in research task: {e}", exc_info=True)
+        
+        # Update progress monitor with error
+        monitor = ProgressMonitorRegistry.get(job_id)
+        if monitor:
+            monitor.record_error(str(e))
+            
         # Update job status on error
         RESEARCH_JOBS[job_id]['status'] = 'failed'
         RESEARCH_JOBS[job_id]['error'] = str(e)
@@ -166,6 +276,7 @@ def submit_research():
     
     # Create topic
     topic = _create_topic(form_data)
+    job_id = topic.id
     
     # Get research parameters
     audience = form_data.get('audience', 'general')
@@ -182,110 +293,44 @@ def submit_research():
     }
     max_depth = depth_mapping.get(depth, 2)
     
+    # Set up parameters for progress monitor
+    parameters = {
+        'audience': audience,
+        'depth': depth,
+        'format': report_format,
+        'time_constraint': time_constraint
+    }
+    
     # Create job
-    job_id = topic.id
     RESEARCH_JOBS[job_id] = {
         'topic': topic.dict(),
         'status': 'queued',
         'submit_time': datetime.now(),
-        'parameters': {
-            'audience': audience,
-            'depth': depth,
-            'format': report_format,
-            'time_constraint': time_constraint
-        }
+        'parameters': parameters
     }
+    
+    # Create progress monitor
+    create_progress_monitor(topic.title, parameters)
     
     # Start research in background
     run_async_task(_run_research(job_id, topic, max_depth))
     
-    # Redirect to progress page
-    return redirect(url_for('view_progress', job_id=job_id))
+    # Redirect to progress page using the new route
+    return redirect(url_for('progress_page', job_id=job_id))
 
 
+# Route redirecting from old progress URL to new one
 @app.route('/research/<job_id>/progress')
 def view_progress(job_id):
-    """Show progress for a research job."""
-    if job_id not in RESEARCH_JOBS:
-        return render_template('error.html', message="Research job not found"), 404
-    
-    job = RESEARCH_JOBS[job_id]
-    
-    # If completed, redirect to results
-    if job['status'] == 'completed':
-        return redirect(url_for('view_results', job_id=job_id))
-    
-    # Calculate progress percentage based on status
-    progress_mapping = {
-        'queued': 5,
-        'running': 50,
-        'completed': 100,
-        'failed': 100
-    }
-    progress = progress_mapping.get(job['status'], 0)
-    
-    # Calculate remaining time (mock calculation)
-    remaining = "Unknown"
-    if 'start_time' in job and job['status'] == 'running':
-        elapsed = (datetime.now() - job['start_time']).total_seconds() / 60
-        if elapsed < job['parameters']['time_constraint']:
-            remaining = f"{int(job['parameters']['time_constraint'] - elapsed)} minutes"
-    
-    return render_template(
-        'progress.html',
-        job=job,
-        progress=progress,
-        remaining=remaining,
-        active_tab='active_research'
-    )
+    """Redirect to the new progress page."""
+    return redirect(url_for('progress_page', job_id=job_id))
 
 
+# Redirect old status API to new progress API
 @app.route('/research/<job_id>/status', methods=['GET'])
 def job_status(job_id):
-    """API endpoint to get job status."""
-    if job_id not in RESEARCH_JOBS:
-        return jsonify({'error': 'Job not found'}), 404
-    
-    job = RESEARCH_JOBS[job_id]
-    
-    # Calculate progress
-    progress_mapping = {
-        'queued': 5,
-        'running': 50,
-        'completed': 100,
-        'failed': 100
-    }
-    progress = progress_mapping.get(job['status'], 0)
-    
-    # Add detailed progress info for running jobs
-    phase = "Planning"
-    if job['status'] == 'running':
-        phases = ["Planning", "Searching", "Analyzing", "Synthesizing", "Report Generation"]
-        if progress <= 20:
-            phase = phases[0]
-        elif progress <= 40:
-            phase = phases[1]
-        elif progress <= 60:
-            phase = phases[2]
-        elif progress <= 80:
-            phase = phases[3]
-        else:
-            phase = phases[4]
-    
-    # Calculate remaining time
-    remaining = None
-    if 'start_time' in job and job['status'] == 'running':
-        elapsed = (datetime.now() - job['start_time']).total_seconds() / 60
-        if elapsed < job['parameters']['time_constraint']:
-            remaining = int(job['parameters']['time_constraint'] - elapsed)
-    
-    return jsonify({
-        'status': job['status'],
-        'progress': progress,
-        'phase': phase,
-        'remaining_minutes': remaining,
-        'redirect_to_results': job['status'] == 'completed'
-    })
+    """Redirects to the new progress API endpoint."""
+    return redirect(url_for('get_progress', job_id=job_id))
 
 
 @app.route('/research/<job_id>/results')
@@ -316,16 +361,29 @@ def view_results(job_id):
 @app.route('/active_research')
 def active_research():
     """Show all active research jobs."""
-    active_jobs = {
+    # Get active jobs from both the legacy system and progress monitoring system
+    legacy_active_jobs = {
         job_id: job for job_id, job in RESEARCH_JOBS.items()
         if job['status'] in ['queued', 'running']
     }
     
-    return render_template(
-        'active_research.html',
-        jobs=active_jobs,
-        active_tab='active_research'
-    )
+    # Get active jobs from ProgressMonitorRegistry
+    progress_active_jobs = ProgressMonitorRegistry.list_active_jobs()
+    
+    # If we have progress monitoring jobs, use them instead
+    if progress_active_jobs:
+        return render_template(
+            'active_research_new.html',
+            active_jobs=progress_active_jobs,
+            active_tab='active_research'
+        )
+    else:
+        # Fall back to legacy template if no progress monitors
+        return render_template(
+            'active_research.html',
+            jobs=legacy_active_jobs,
+            active_tab='active_research'
+        )
 
 
 @app.route('/completed_reports')

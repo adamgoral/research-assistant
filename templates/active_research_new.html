@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+
+{% block title %}Active Research{% endblock %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/progress.css') }}">
+<style>
+  .active-jobs-list {
+    margin-top: 20px;
+  }
+  
+  .active-job-card {
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 15px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 15px;
+  }
+  
+  .job-info h3 {
+    margin-top: 0;
+    margin-bottom: 10px;
+    color: #2c7be5;
+  }
+  
+  .job-meta {
+    font-size: 0.9em;
+    color: #666;
+    margin-bottom: 10px;
+  }
+  
+  .job-progress {
+    margin-top: 10px;
+  }
+  
+  .job-progress .progress-bar {
+    height: 8px;
+    margin: 8px 0;
+  }
+  
+  .job-actions {
+    display: flex;
+    align-items: center;
+  }
+  
+  .job-actions .button {
+    white-space: nowrap;
+  }
+  
+  .no-jobs-message {
+    background-color: #f0f4f8;
+    padding: 20px;
+    border-radius: 8px;
+    text-align: center;
+    margin-top: 20px;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<section>
+  <h2>Active Research</h2>
+  <p>Monitor the progress of your ongoing research tasks.</p>
+  
+  <div class="active-jobs-list">
+    {% if active_jobs %}
+      {% for job in active_jobs %}
+      <div class="active-job-card">
+        <div class="job-info">
+          <h3>{{ job.topic }}</h3>
+          <div class="job-meta">
+            <span><strong>Started:</strong> {{ job.start_time|datetime }}</span> |
+            <span><strong>Phase:</strong> {{ job.phase|title }}</span>
+          </div>
+          <div class="job-progress">
+            <div class="progress-status">
+              <span>{{ job.progress }}% Complete</span>
+            </div>
+            <div class="progress-bar">
+              <div class="progress-fill" style="width: {{ job.progress }}%;"></div>
+            </div>
+          </div>
+        </div>
+        <div class="job-actions">
+          <a href="{{ url_for('progress_page', job_id=job.job_id) }}" class="button">View Progress</a>
+        </div>
+      </div>
+      {% endfor %}
+    {% else %}
+      <div class="no-jobs-message">
+        <p>No active research jobs at the moment.</p>
+        <a href="{{ url_for('index') }}" class="button">Start New Research</a>
+      </div>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  // Auto-refresh the page every 10 seconds
+  document.addEventListener('DOMContentLoaded', function() {
+    setTimeout(function() {
+      location.reload();
+    }, 10000);
+  });
+</script>
+{% endblock %}

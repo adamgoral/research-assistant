@@ -2,14 +2,18 @@
 
 {% block title %}Research Progress{% endblock %}
 
+{% block extra_head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/progress.css') }}">
+{% endblock %}
+
 {% block content %}
 <section class="research-form">
   <h2>Research in Progress</h2>
-  <p>Your research on "{{ job.topic.title }}" is being processed.</p>
+  <p>Your research on "{{ topic }}" is being processed.</p>
   
-  <div class="progress-container" data-job-id="{{ job.topic.id }}">
+  <div class="progress-container" data-job-id="{{ job_id }}">
     <div class="status-indicator">
-      <span>Status: {{ job.status|title }}</span>
+      <span>Status: {{ status_message }}</span>
     </div>
     
     <div class="progress-bar">
@@ -21,23 +25,23 @@
       <span>Est. completion: {{ remaining }}</span>
     </div>
     
-    <div class="status-indicator {% if progress <= 20 %}active{% endif %}">
+    <div class="status-indicator {% if phase == 'planning' %}active{% endif %}">
       <span>Planning</span>
     </div>
     
-    <div class="status-indicator {% if progress > 20 and progress <= 40 %}active{% endif %}">
+    <div class="status-indicator {% if phase == 'searching' %}active{% endif %}">
       <span>Searching</span>
     </div>
     
-    <div class="status-indicator {% if progress > 40 and progress <= 60 %}active{% endif %}">
+    <div class="status-indicator {% if phase == 'analyzing' %}active{% endif %}">
       <span>Analyzing</span>
     </div>
     
-    <div class="status-indicator {% if progress > 60 and progress <= 80 %}active{% endif %}">
+    <div class="status-indicator {% if phase == 'synthesizing' %}active{% endif %}">
       <span>Synthesizing</span>
     </div>
     
-    <div class="status-indicator {% if progress > 80 %}active{% endif %}">
+    <div class="status-indicator {% if phase == 'report_generation' %}active{% endif %}">
       <span>Report Generation</span>
     </div>
   </div>
@@ -45,24 +49,26 @@
   <div class="research-parameters">
     <h3>Research Parameters</h3>
     <ul>
-      <li><strong>Audience:</strong> {{ job.parameters.audience|title }}</li>
-      <li><strong>Depth:</strong> {{ job.parameters.depth|title }}</li>
-      <li><strong>Format:</strong> {{ job.parameters.format|title }}</li>
-      <li><strong>Time Constraint:</strong> {{ job.parameters.time_constraint }} minutes</li>
+      <li><strong>Audience:</strong> {{ parameters.audience|title }}</li>
+      <li><strong>Depth:</strong> {{ parameters.depth|title }}</li>
+      <li><strong>Format:</strong> {{ parameters.format|title }}</li>
+      <li><strong>Time Constraint:</strong> {{ parameters.time_constraint }} minutes</li>
     </ul>
   </div>
+  
+  {% if is_completed %}
+  <div class="completion-message">
+    <h3>Research Complete!</h3>
+    <p>Your research has been successfully completed.</p>
+    <div class="action-buttons">
+      <a href="{{ url_for('view_results', job_id=job_id) }}" class="button">View Results</a>
+      <a href="{{ url_for('index') }}" class="button secondary">Back to Home</a>
+    </div>
+  </div>
+  {% endif %}
 </section>
 {% endblock %}
 
 {% block extra_js %}
-<script>
-  document.addEventListener('DOMContentLoaded', function() {
-    // Auto-refresh the page if not polling via AJAX
-    setTimeout(function() {
-      if (typeof pollJobStatus !== 'function') {
-        location.reload();
-      }
-    }, 10000);
-  });
-</script>
+<script src="{{ url_for('static', filename='js/progress.js') }}"></script>
 {% endblock %}
