@@ -57,6 +57,13 @@ def format_datetime(value, format='%b %d, %Y at %H:%M'):
             return value
     return value.strftime(format)
 
+@app.template_filter('timestamp_to_datetime')
+def timestamp_to_datetime(timestamp, format='%b %d, %Y at %H:%M'):
+    """Convert a Unix timestamp to a formatted datetime string."""
+    if timestamp:
+        return datetime.fromtimestamp(timestamp).strftime(format)
+    return "Unknown"
+
 
 # ----- Helper Functions -----
 
