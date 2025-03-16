@@ -22,7 +22,8 @@
   
   <main>
     <div class="tabs">
-      <a href="{{ url_for('index') }}" class="tab {% if active_tab == 'new_research' %}active{% endif %}" data-target="/">New Research</a>
+      <a href="{{ url_for('index') }}" class="tab {% if active_tab == 'new_research' %}active{% endif %}" data-target="/">Home</a>
+      <a href="{{ url_for('new_research_request') }}" class="tab {% if active_tab == 'new_research_request' %}active{% endif %}" data-target="/research/new">New Research</a>
       <a href="{{ url_for('active_research') }}" class="tab {% if active_tab == 'active_research' %}active{% endif %}" data-target="/active_research">Active Research</a>
       <a href="{{ url_for('completed_reports') }}" class="tab {% if active_tab == 'completed_reports' %}active{% endif %}" data-target="/completed_reports">Completed Reports</a>
     </div>

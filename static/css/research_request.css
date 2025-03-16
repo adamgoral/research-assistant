@@ -1,0 +1,460 @@
+/**
+ * Research Request CSS
+ *
+ * Styles for the enhanced research request form.
+ */
+
+.research-request-container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.research-intro {
+  margin-bottom: 30px;
+  text-align: center;
+}
+
+.research-intro h2 {
+  margin-bottom: 15px;
+  color: #2c7be5;
+}
+
+.research-intro p {
+  font-size: 1.1em;
+  color: #495057;
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+/* Form sections */
+.form-section {
+  background-color: #fff;
+  border-radius: 10px;
+  padding: 25px;
+  margin-bottom: 30px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+}
+
+.form-section h3 {
+  margin-top: 0;
+  margin-bottom: 15px;
+  color: #2c7be5;
+  font-size: 1.2em;
+  border-bottom: 1px solid #eaecef;
+  padding-bottom: 10px;
+}
+
+/* Topic section */
+.topic-section {
+  border-left: 4px solid #2c7be5;
+}
+
+.input-group {
+  margin-bottom: 15px;
+  position: relative;
+}
+
+.input-group label {
+  display: block;
+  margin-bottom: 10px;
+  font-weight: 500;
+  color: #495057;
+}
+
+.input-group textarea {
+  width: 100%;
+  min-height: 120px;
+  padding: 12px;
+  border: 1px solid #ced4da;
+  border-radius: 6px;
+  font-size: 1em;
+  font-family: inherit;
+  resize: vertical;
+  transition: border-color 0.2s;
+}
+
+.input-group textarea:focus {
+  border-color: #2c7be5;
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(44, 123, 229, 0.25);
+}
+
+.example-questions {
+  background-color: #f8f9fa;
+  border-radius: 6px;
+  padding: 15px;
+  margin-top: 20px;
+}
+
+.example-questions h4 {
+  margin-top: 0;
+  margin-bottom: 10px;
+  font-size: 1em;
+  color: #495057;
+}
+
+.example-questions ul {
+  margin: 0;
+  padding-left: 20px;
+}
+
+.example-questions li {
+  margin-bottom: 8px;
+  color: #666;
+  font-style: italic;
+  cursor: pointer;
+}
+
+.example-questions li:hover {
+  color: #2c7be5;
+  text-decoration: underline;
+}
+
+/* Parameters section */
+.parameters-section {
+  border-left: 4px solid #ffc107;
+}
+
+.parameters-section > p {
+  margin-top: 0;
+  margin-bottom: 20px;
+  color: #6c757d;
+}
+
+.parameters-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  gap: 20px;
+}
+
+.parameter-group {
+  margin-bottom: 20px;
+}
+
+.parameter-group label {
+  display: block;
+  margin-bottom: 10px;
+  font-weight: 500;
+  color: #495057;
+}
+
+.parameter-group select {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ced4da;
+  border-radius: 6px;
+  font-size: 1em;
+  background-color: #fff;
+  transition: border-color 0.2s;
+}
+
+.parameter-group select:focus {
+  border-color: #2c7be5;
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(44, 123, 229, 0.25);
+}
+
+.parameter-description {
+  margin-top: 10px;
+  font-size: 0.85em;
+  color: #6c757d;
+  line-height: 1.5;
+}
+
+/* Tooltip styles */
+.tooltip-container {
+  display: inline-block;
+  position: relative;
+  margin-left: 5px;
+  vertical-align: middle;
+}
+
+.tooltip-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background-color: #6c757d;
+  color: white;
+  font-size: 0.75em;
+  cursor: pointer;
+}
+
+.tooltip-content {
+  position: absolute;
+  top: calc(100% + 10px);
+  left: 50%;
+  transform: translateX(-50%);
+  width: 250px;
+  padding: 10px;
+  background-color: #fff;
+  border-radius: 6px;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+  font-size: 0.85em;
+  color: #495057;
+  z-index: 10;
+  display: none;
+}
+
+.tooltip-container:hover .tooltip-content {
+  display: block;
+}
+
+.tooltip-content:before {
+  content: "";
+  position: absolute;
+  top: -6px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-left: 6px solid transparent;
+  border-right: 6px solid transparent;
+  border-bottom: 6px solid #fff;
+}
+
+/* Output preview section */
+.output-preview {
+  border-left: 4px solid #28a745;
+}
+
+.preview-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 20px;
+}
+
+.report-preview, .benefits-list {
+  background-color: #f8f9fa;
+  border-radius: 6px;
+  padding: 15px;
+}
+
+.report-preview h4, .benefits-list h4 {
+  margin-top: 0;
+  margin-bottom: 15px;
+  color: #495057;
+  font-size: 1em;
+}
+
+.report-preview ul, .benefits-list ul {
+  margin: 0;
+  padding-left: 20px;
+}
+
+.report-preview li {
+  margin-bottom: 8px;
+  color: #495057;
+}
+
+.benefits-list li {
+  margin-bottom: 10px;
+  color: #495057;
+  list-style-type: none;
+  display: flex;
+  align-items: center;
+}
+
+.benefit-icon {
+  margin-right: 10px;
+  font-size: 1.2em;
+}
+
+/* Submit section */
+.submit-section {
+  text-align: center;
+  margin-top: 30px;
+}
+
+.disclaimer {
+  font-size: 0.85em;
+  color: #6c757d;
+  margin-bottom: 15px;
+}
+
+.submit-button {
+  display: inline-block;
+  background-color: #2c7be5;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 12px 30px;
+  font-size: 1.1em;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.submit-button:hover {
+  background-color: #1a68c7;
+}
+
+/* Recent reports */
+.recent-reports-container {
+  max-width: 900px;
+  margin: 30px auto;
+  padding: 20px;
+}
+
+.recent-reports-container h3 {
+  margin-top: 0;
+  margin-bottom: 20px;
+  color: #495057;
+  text-align: center;
+}
+
+.reports-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 20px;
+}
+
+.report-card {
+  background-color: #fff;
+  border-radius: 8px;
+  padding: 15px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.report-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.report-card h4 {
+  margin-top: 0;
+  margin-bottom: 10px;
+  font-size: 1.1em;
+}
+
+.report-card h4 a {
+  color: #2c7be5;
+  text-decoration: none;
+}
+
+.report-meta {
+  margin-bottom: 15px;
+  font-size: 0.85em;
+  color: #6c757d;
+  display: flex;
+  justify-content: space-between;
+}
+
+.view-report-button {
+  display: block;
+  text-align: center;
+  background-color: #f8f9fa;
+  color: #495057;
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+  padding: 8px 0;
+  text-decoration: none;
+  font-size: 0.9em;
+  transition: background-color 0.2s;
+}
+
+.view-report-button:hover {
+  background-color: #e9ecef;
+}
+
+/* Enhanced request banner for index page */
+.enhanced-request-banner {
+  background-color: #e8f4ff;
+  border-radius: 6px;
+  padding: 15px;
+  margin-bottom: 20px;
+  border-left: 4px solid #2c7be5;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+}
+
+.enhanced-request-banner p {
+  margin: 0;
+  color: #495057;
+}
+
+.enhanced-btn {
+  display: inline-block;
+  background-color: #2c7be5;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 8px 16px;
+  text-decoration: none;
+  font-weight: 500;
+  margin-left: 10px;
+  transition: background-color 0.2s;
+}
+
+.enhanced-btn:hover {
+  background-color: #1a68c7;
+}
+
+/* Loading animation */
+.submit-button.loading {
+  position: relative;
+  color: transparent;
+}
+
+.submit-button.loading::after {
+  content: "";
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  top: 50%;
+  left: 50%;
+  margin-top: -10px;
+  margin-left: -10px;
+  border: 3px solid rgba(255,255,255,0.3);
+  border-radius: 50%;
+  border-top-color: #fff;
+  animation: spin 1s ease-in-out infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.error {
+  border-color: #dc3545 !important;
+  box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.25) !important;
+}
+
+.error-message {
+  color: #dc3545;
+  font-size: 0.85em;
+  margin-top: 5px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .parameters-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .preview-container {
+    grid-template-columns: 1fr;
+  }
+  
+  .reports-list {
+    grid-template-columns: 1fr;
+  }
+  
+  .enhanced-request-banner {
+    flex-direction: column;
+  }
+  
+  .enhanced-request-banner p {
+    margin-bottom: 10px;
+  }
+  
+  .enhanced-btn {
+    margin-left: 0;
+  }
+}

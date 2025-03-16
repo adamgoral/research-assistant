@@ -81,7 +81,7 @@ def _generate_job_id() -> str:
     return str(uuid.uuid4())
 
 
-def _create_topic(form_data: Dict) -> ResearchTopic:
+def _create_topic(form_data: Dict, job_id: str = None) -> ResearchTopic:
     """Create a ResearchTopic from form data."""
     # Extract keywords from the topic
     topic_text = form_data.get('research_topic', '')
@@ -92,8 +92,12 @@ def _create_topic(form_data: Dict) -> ResearchTopic:
         words = topic_text.split()
         keywords = [w for w in words if len(w) > 3][:5]
     
+    # Use provided job_id or generate a new one
+    if job_id is None:
+        job_id = _generate_job_id()
+    
     return ResearchTopic(
-        id=_generate_job_id(),
+        id=job_id,
         title=topic_text,
         description=topic_text,
         keywords=keywords
@@ -159,13 +163,16 @@ async def _run_research(job_id: str, topic: ResearchTopic, max_depth: int):
         )
         
         # Run the research
+        # Update progress manually since research_topic doesn't accept progress_callback
+        update_research_progress(job_id, 25, "Starting web search")
+        
         stats = await pipeline.research_topic(
             topic,
             max_queries=max_depth,
-            max_results_per_query=max_depth,
-            progress_callback=lambda progress, message, details=None: 
-                update_research_progress(job_id, 25 + (progress * 0.15), message, details)
+            max_results_per_query=max_depth
         )
+        
+        update_research_progress(job_id, 40, "Web search completed")
         
         # Update progress - Analyzing phase
         update_research_phase(
@@ -175,11 +182,9 @@ async def _run_research(job_id: str, topic: ResearchTopic, max_depth: int):
         )
         
         # Get the research results
-        results = await pipeline.get_research_results(
-            topic.id,
-            progress_callback=lambda progress, message, details=None: 
-                update_research_progress(job_id, 45 + (progress * 0.15), message, details)
-        )
+        update_research_progress(job_id, 45, "Analyzing research results")
+        results = await pipeline.get_research_results(topic.id)
+        update_research_progress(job_id, 60, "Analysis completed")
         
         # Update progress - Synthesizing phase
         update_research_phase(
@@ -274,6 +279,15 @@ def index():
         active_tab='new_research'
     )
 
+@app.route('/research/new')
+def new_research_request():
+    """Render the enhanced research request page."""
+    return render_template(
+        'research_request.html',
+        recent_reports=RECENT_REPORTS[:4],  # Show only 4 most recent
+        active_tab='new_research_request'
+    )
+
 
 @app.route('/submit_research', methods=['POST'])
 def submit_research():
@@ -281,15 +295,28 @@ def submit_research():
     # Get form data
     form_data = request.form.to_dict()
     
-    # Create topic
-    topic = _create_topic(form_data)
-    job_id = topic.id
+    # Create progress monitor first to get job_id
+    topic_title = form_data.get('research_topic', '')
     
     # Get research parameters
     audience = form_data.get('audience', 'general')
     depth = form_data.get('depth', 'standard')
     report_format = form_data.get('format', 'report')
     time_constraint = int(form_data.get('time', 30))
+    
+    # Set up parameters for progress monitor
+    parameters = {
+        'audience': audience,
+        'depth': depth,
+        'format': report_format,
+        'time_constraint': time_constraint
+    }
+    
+    # Create monitor with the same job_id
+    job_id, monitor = create_progress_monitor(topic_title, parameters)
+    
+    # Now create topic with the same job_id
+    topic = _create_topic(form_data, job_id=job_id)
     
     # Map depth to query counts
     depth_mapping = {
@@ -300,14 +327,6 @@ def submit_research():
     }
     max_depth = depth_mapping.get(depth, 2)
     
-    # Set up parameters for progress monitor
-    parameters = {
-        'audience': audience,
-        'depth': depth,
-        'format': report_format,
-        'time_constraint': time_constraint
-    }
-    
     # Create job
     RESEARCH_JOBS[job_id] = {
         'topic': topic.dict(),
@@ -316,31 +335,29 @@ def submit_research():
         'parameters': parameters
     }
     
-    # Create progress monitor
-    create_progress_monitor(topic.title, parameters)
-    
     # Start research in background
     run_async_task(_run_research(job_id, topic, max_depth))
     
     # Redirect to progress page using the new route
-    return redirect(url_for('progress_page', job_id=job_id))
+    return redirect(url_for('progress.progress_page', job_id=job_id))
 
 
 # Route redirecting from old progress URL to new one
 @app.route('/research/<job_id>/progress')
 def view_progress(job_id):
     """Redirect to the new progress page."""
-    return redirect(url_for('progress_page', job_id=job_id))
+    return redirect(url_for('progress.progress_page', job_id=job_id))
 
 
 # Redirect old status API to new progress API
 @app.route('/research/<job_id>/status', methods=['GET'])
 def job_status(job_id):
     """Redirects to the new progress API endpoint."""
-    return redirect(url_for('get_progress', job_id=job_id))
+    return redirect(url_for('progress.get_progress', job_id=job_id))
 
 
 @app.route('/research/<job_id>/results')
+@app.route('/results/<job_id>')  # Add an additional route pattern
 def view_results(job_id):
     """Show results for a completed research job."""
     if job_id not in RESEARCH_JOBS:
@@ -352,7 +369,7 @@ def view_results(job_id):
                 'error.html', 
                 message=f"Research failed: {RESEARCH_JOBS[job_id].get('error', 'Unknown error')}"
             ), 500
-        return redirect(url_for('view_progress', job_id=job_id))
+        return redirect(url_for('progress.progress_page', job_id=job_id))
     
     job = RESEARCH_JOBS[job_id]
     results = RESEARCH_RESULTS[job_id]

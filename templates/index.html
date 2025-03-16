@@ -7,6 +7,10 @@
   <div>
     <section class="research-form">
       <h2>Research Request</h2>
+      <div class="enhanced-request-banner">
+        <p>Try our enhanced research request form for a better experience!</p>
+        <a href="{{ url_for('new_research_request') }}" class="enhanced-btn">Enhanced Research Form</a>
+      </div>
       <form action="{{ url_for('submit_research') }}" method="POST">
         <div>
           <label for="research-topic">Research Topic or Question</label>

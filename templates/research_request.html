@@ -1,0 +1,196 @@
+{% extends "base.html" %}
+
+{% block title %}Research Assistant - New Research Request{% endblock %}
+
+{% block extra_head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/research_request.css') }}">
+{% endblock %}
+
+{% block content %}
+<section class="research-request-container">
+  <div class="research-intro">
+    <h2>Create a Research Request</h2>
+    <p>Our AI-powered Research Assistant will search the web, analyze credible sources, and generate a comprehensive report based on your specifications.</p>
+  </div>
+
+  <form action="{{ url_for('submit_research') }}" method="POST" class="research-form enhanced">
+    <div class="form-section topic-section">
+      <h3>Research Topic</h3>
+      <div class="input-group">
+        <label for="research-topic">What would you like to research?</label>
+        <div class="tooltip-container">
+          <div class="tooltip-icon" aria-label="Help">?</div>
+          <div class="tooltip-content">
+            Be specific with your research question. For example, "What are the environmental impacts of electric vehicles compared to conventional vehicles?" is better than "electric cars."
+          </div>
+        </div>
+        <textarea 
+          id="research-topic" 
+          name="research_topic" 
+          placeholder="Enter a specific research topic or question..."
+          required></textarea>
+      </div>
+      
+      <div class="example-questions">
+        <h4>Example Research Questions:</h4>
+        <ul>
+          <li>What are the economic impacts of remote work on urban centers?</li>
+          <li>How does intermittent fasting affect metabolic health?</li>
+          <li>What are the most effective strategies for reducing plastic pollution in oceans?</li>
+        </ul>
+      </div>
+    </div>
+    
+    <div class="form-section parameters-section">
+      <h3>Research Parameters</h3>
+      <p>Customize how your research is conducted and presented.</p>
+      
+      <div class="parameters-grid">
+        <div class="parameter-group">
+          <label for="audience">Target Audience</label>
+          <div class="tooltip-container">
+            <div class="tooltip-icon" aria-label="Help">?</div>
+            <div class="tooltip-content">
+              Who will be reading this report? This affects the vocabulary and detail level.
+            </div>
+          </div>
+          <select id="audience" name="audience">
+            <option value="general">General Audience</option>
+            <option value="academic">Academic</option>
+            <option value="professional">Professional</option>
+            <option value="technical">Technical</option>
+          </select>
+          <div class="parameter-description">
+            <strong>General:</strong> Accessible to everyone
+            <br><strong>Academic:</strong> Scholarly tone with citations
+            <br><strong>Professional:</strong> Business-oriented perspective
+            <br><strong>Technical:</strong> Industry-specific terminology
+          </div>
+        </div>
+        
+        <div class="parameter-group">
+          <label for="depth">Research Depth</label>
+          <div class="tooltip-container">
+            <div class="tooltip-icon" aria-label="Help">?</div>
+            <div class="tooltip-content">
+              How thorough should the research be? More depth requires more time but provides more complete information.
+            </div>
+          </div>
+          <select id="depth" name="depth">
+            <option value="brief">Brief Overview</option>
+            <option value="standard" selected>Standard</option>
+            <option value="comprehensive">Comprehensive</option>
+            <option value="expert">Expert Analysis</option>
+          </select>
+          <div class="parameter-description">
+            <strong>Brief:</strong> Key points only (1-2 sources)
+            <br><strong>Standard:</strong> Well-rounded coverage (3-5 sources)
+            <br><strong>Comprehensive:</strong> Detailed analysis (5-7 sources)
+            <br><strong>Expert:</strong> In-depth investigation (7+ sources)
+          </div>
+        </div>
+        
+        <div class="parameter-group">
+          <label for="report-format">Report Format</label>
+          <div class="tooltip-container">
+            <div class="tooltip-icon" aria-label="Help">?</div>
+            <div class="tooltip-content">
+              How should the information be presented? Different formats serve different purposes.
+            </div>
+          </div>
+          <select id="report-format" name="format">
+            <option value="summary">Executive Summary</option>
+            <option value="report" selected>Standard Report</option>
+            <option value="analysis">Analytical Report</option>
+            <option value="presentation">Presentation</option>
+          </select>
+          <div class="parameter-description">
+            <strong>Summary:</strong> Brief overview of key findings
+            <br><strong>Standard:</strong> Traditional report with sections
+            <br><strong>Analytical:</strong> Emphasis on data and analysis
+            <br><strong>Presentation:</strong> Slide-like format with bullet points
+          </div>
+        </div>
+        
+        <div class="parameter-group">
+          <label for="time-constraint">Time Constraint</label>
+          <div class="tooltip-container">
+            <div class="tooltip-icon" aria-label="Help">?</div>
+            <div class="tooltip-content">
+              How much time should be spent on research? Longer timeframes allow for more thorough research but take longer to complete.
+            </div>
+          </div>
+          <select id="time-constraint" name="time">
+            <option value="15">Quick (15 min)</option>
+            <option value="30" selected>Standard (30 min)</option>
+            <option value="60">Thorough (1 hour)</option>
+            <option value="120">Comprehensive (2 hours)</option>
+          </select>
+          <div class="parameter-description">
+            <strong>Quick:</strong> Fast results with key information
+            <br><strong>Standard:</strong> Balanced depth and speed
+            <br><strong>Thorough:</strong> Detailed with better source quality
+            <br><strong>Comprehensive:</strong> Maximum depth and verification
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="form-section output-preview">
+      <h3>What You'll Receive</h3>
+      <div class="preview-container">
+        <div class="report-preview">
+          <h4>Sample Report Structure</h4>
+          <ul>
+            <li><strong>Executive Summary</strong>: Key findings at a glance</li>
+            <li><strong>Introduction</strong>: Topic overview and context</li>
+            <li><strong>Methodology</strong>: How the research was conducted</li>
+            <li><strong>Main Sections</strong>: Organized by subtopics with findings</li>
+            <li><strong>Analysis</strong>: Interpretation of information</li>
+            <li><strong>Conclusion</strong>: Summary of findings</li>
+            <li><strong>References</strong>: All sources properly cited</li>
+          </ul>
+        </div>
+        
+        <div class="benefits-list">
+          <h4>Benefits</h4>
+          <ul>
+            <li><span class="benefit-icon">⏱️</span> Save hours of research time</li>
+            <li><span class="benefit-icon">📊</span> Get information from multiple sources</li>
+            <li><span class="benefit-icon">✅</span> Ensure factual accuracy with citations</li>
+            <li><span class="benefit-icon">📝</span> Receive a well-structured report</li>
+            <li><span class="benefit-icon">🔍</span> Track research progress in real-time</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    
+    <div class="submit-section">
+      <p class="disclaimer">Research is limited to publicly available information. Reports will not include access to paywalled content.</p>
+      <button type="submit" class="submit-button">Start Research</button>
+    </div>
+  </form>
+</section>
+
+{% if recent_reports %}
+<section class="recent-reports-container">
+  <h3>Your Recent Reports</h3>
+  <div class="reports-list">
+    {% for report in recent_reports %}
+      <div class="report-card">
+        <h4><a href="{{ url_for('view_results', job_id=report.job_id) }}">{{ report.title }}</a></h4>
+        <div class="report-meta">
+          <span class="report-time">{{ report.timestamp|datetime }}</span>
+          <span class="report-type">{{ report.report_type }}</span>
+        </div>
+        <a href="{{ url_for('view_results', job_id=report.job_id) }}" class="view-report-button">View Report</a>
+      </div>
+    {% endfor %}
+  </div>
+</section>
+{% endif %}
+{% endblock %}
+
+{% block extra_js %}
+<script src="{{ url_for('static', filename='js/research_request.js') }}"></script>
+{% endblock %}

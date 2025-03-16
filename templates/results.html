@@ -2,156 +2,252 @@
 
 {% block title %}Research Results{% endblock %}
 
+{% block extra_head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+<style>
+  .results-container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 2rem;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  }
+  
+  .results-header {
+    margin-bottom: 2rem;
+    border-bottom: 1px solid #e0e0e0;
+    padding-bottom: 1.5rem;
+  }
+  
+  .results-meta {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    margin-bottom: 1rem;
+    font-size: 0.9rem;
+    color: #666;
+  }
+  
+  .section {
+    margin-bottom: 2rem;
+  }
+  
+  .section-title {
+    font-size: 1.5rem;
+    color: #4a4a9c;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid #eee;
+  }
+  
+  .source {
+    margin-bottom: 1.5rem;
+    padding: 1rem;
+    background-color: #f9f9f9;
+    border-radius: 4px;
+  }
+  
+  .source-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 0.5rem;
+  }
+  
+  .source-title {
+    font-weight: 600;
+    color: #333;
+  }
+  
+  .source-url {
+    font-size: 0.85rem;
+    word-break: break-all;
+    color: #4285f4;
+  }
+  
+  .source-meta {
+    font-size: 0.85rem;
+    color: #666;
+    margin-bottom: 0.5rem;
+  }
+  
+  .source-content {
+    border-left: 3px solid #ddd;
+    padding-left: 1rem;
+    margin-top: 0.5rem;
+  }
+  
+  .source-credibility {
+    display: inline-block;
+    padding: 0.25rem 0.5rem;
+    border-radius: 3px;
+    font-size: 0.8rem;
+    margin-right: 0.5rem;
+  }
+  
+  .credibility-high {
+    background-color: #d4edda;
+    color: #155724;
+  }
+  
+  .credibility-medium {
+    background-color: #fff3cd;
+    color: #856404;
+  }
+  
+  .credibility-low {
+    background-color: #f8d7da;
+    color: #721c24;
+  }
+  
+  .credibility-unknown {
+    background-color: #e2e3e5;
+    color: #383d41;
+  }
+  
+  .statistics {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-bottom: 2rem;
+  }
+  
+  .statistic {
+    padding: 1rem;
+    background-color: #f5f7ff;
+    border-radius: 4px;
+    text-align: center;
+  }
+  
+  .statistic-value {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #4a4a9c;
+    margin-bottom: 0.5rem;
+  }
+  
+  .statistic-label {
+    font-size: 0.9rem;
+    color: #666;
+  }
+  
+  .information-item {
+    margin-bottom: 1rem;
+    padding: 1rem;
+    background-color: #f9f9f9;
+    border-radius: 4px;
+  }
+  
+  .information-text {
+    margin-bottom: 0.5rem;
+  }
+  
+  .relevance-score {
+    font-size: 0.85rem;
+    color: #666;
+  }
+  
+  .action-buttons {
+    display: flex;
+    gap: 1rem;
+    margin-top: 2rem;
+  }
+  
+  .action-button {
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 4px;
+    background-color: #4a4a9c;
+    color: white;
+    font-weight: 500;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-block;
+    text-align: center;
+  }
+  
+  .action-button.secondary {
+    background-color: #6c757d;
+  }
+</style>
+{% endblock %}
+
 {% block content %}
-<section class="research-form">
-  <h2>Research Results</h2>
-  <p>Research on "{{ job.topic.title }}" has been completed.</p>
-  
-  <div class="research-parameters">
-    <h3>Research Parameters</h3>
-    <ul>
-      <li><strong>Audience:</strong> {{ job.parameters.audience|title }}</li>
-      <li><strong>Depth:</strong> {{ job.parameters.depth|title }}</li>
-      <li><strong>Format:</strong> {{ job.parameters.format|title }}</li>
-      <li><strong>Time Constraint:</strong> {{ job.parameters.time_constraint }} minutes</li>
-    </ul>
-  </div>
-</section>
-
-<section class="results-view">
-  <h3>Research Sources</h3>
-  <p>Top sources related to "{{ job.topic.title }}"</p>
-  
-  <div class="source-list">
-    {% for source in results.results.sources[:5] %}
-      <div class="source-item">
-        <div class="source-rating">
-          <div class="rating-value">{{ (source.evaluation.relevance_score * 100) | int }}</div>
-          <div class="rating-label">Relevance</div>
-        </div>
-        
-        <div class="source-content">
-          <h4>{{ source.title }}</h4>
-          <a href="{{ source.url }}" target="_blank" class="source-url">{{ source.url }}</a>
-          
-          {% if source.information %}
-            <p class="source-snippet">
-              {{ source.information[0].text[:200] }}...
-            </p>
-          {% endif %}
-          
-          <div class="source-meta">
-            {% if source.evaluation.evaluation_factors.domain_type %}
-              <span>{{ source.evaluation.evaluation_factors.domain_type|title }}</span>
-            {% endif %}
-          </div>
-          
-          <div>
-            {% if source.evaluation.credibility == "high" %}
-              <span class="badge badge-green">High Credibility</span>
-            {% elif source.evaluation.credibility == "medium" %}
-              <span class="badge badge-blue">Medium Credibility</span>
-            {% elif source.evaluation.credibility == "low" %}
-              <span class="badge badge-orange">Low Credibility</span>
-            {% endif %}
-            
-            {% if source.evaluation.evaluation_factors.has_references %}
-              <span class="badge badge-blue">References</span>
-            {% endif %}
-          </div>
-        </div>
-      </div>
-    {% else %}
-      <div class="source-item">
-        <p>No sources found for this research topic.</p>
-      </div>
-    {% endfor %}
-  </div>
-</section>
-
-<section class="report-container">
-  <div class="report-header">
-    <h2>{{ job.topic.title }}</h2>
-    <div class="report-metadata">
-      <div>Generated: {{ results.completion_time|datetime }}</div>
-      <div>Research Depth: {{ job.parameters.depth|title }}</div>
-      <div>Sources: {{ results.results.sources|length }}</div>
+<section class="results-container">
+  <div class="results-header">
+    <h2>Research Report: {{ job.topic.title }}</h2>
+    <div class="results-meta">
+      <span>Completed on: {{ job.completion_time|datetime }}</span>
+      <span>Format: {{ job.parameters.format|title }}</span>
+      <span>Depth: {{ job.parameters.depth|title }}</span>
     </div>
   </div>
   
-  <div class="report-section">
-    <h3>Executive Summary</h3>
-    <p>
-      This report provides a comprehensive overview of "{{ job.topic.title }}" based on research 
-      from {{ results.results.sources|length }} sources. The analysis explores key aspects of the topic,
-      including major findings, trends, and expert opinions.
-    </p>
+  <div class="section">
+    <h3 class="section-title">Executive Summary</h3>
+    <p>This report presents findings on "{{ job.topic.title }}" based on analysis of multiple sources. The research examines key aspects and provides a comprehensive overview of the topic.</p>
   </div>
   
-  <div class="report-section">
-    <h3>Key Findings</h3>
-    <p>The research identified several important findings related to this topic:</p>
-    <ol>
-      {% for source in results.results.sources[:3] %}
-        {% if source.information %}
-          <li>
-            <strong>{{ source.information[0].text.split('.')[0] }}.</strong>
-            <div class="source-citation">[Source: {{ source.title }}]</div>
-          </li>
-        {% endif %}
-      {% else %}
-        <li>No key findings available for this research topic.</li>
+  <div class="section">
+    <h3 class="section-title">Research Statistics</h3>
+    <div class="statistics">
+      <div class="statistic">
+        <div class="statistic-value">{{ results.stats.search_results }}</div>
+        <div class="statistic-label">Search Results</div>
+      </div>
+      <div class="statistic">
+        <div class="statistic-value">{{ results.stats.pages_retrieved }}</div>
+        <div class="statistic-label">Pages Retrieved</div>
+      </div>
+      <div class="statistic">
+        <div class="statistic-value">{{ results.stats.information_items_extracted }}</div>
+        <div class="statistic-label">Information Items</div>
+      </div>
+      <div class="statistic">
+        <div class="statistic-value">{{ results.stats.queries_generated }}</div>
+        <div class="statistic-label">Queries Generated</div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="section">
+    <h3 class="section-title">Key Findings</h3>
+    {% for source in results.results.sources %}
+      {% for info in source.information %}
+        <div class="information-item">
+          <div class="information-text">{{ info.text }}</div>
+          <div class="relevance-score">Relevance: {{ (info.relevance_score * 100)|int }}%</div>
+        </div>
       {% endfor %}
-    </ol>
+    {% endfor %}
   </div>
   
-  <div class="export-options">
-    <button>Download Full Report (PDF)</button>
-    <button class="btn-secondary">Export as Word</button>
-    <button class="btn-secondary">Share Report</button>
+  <div class="section">
+    <h3 class="section-title">Sources</h3>
+    {% for source in results.results.sources %}
+      <div class="source">
+        <div class="source-header">
+          <div class="source-title">{{ source.title }}</div>
+          <div>
+            {% set credibility = source.evaluation.credibility %}
+            <span class="source-credibility credibility-{{ credibility }}">
+              {{ credibility|title }} Credibility
+            </span>
+          </div>
+        </div>
+        <div class="source-url">
+          <a href="{{ source.url }}" target="_blank">{{ source.url }}</a>
+        </div>
+        <div class="source-meta">
+          Relevance Score: {{ (source.evaluation.relevance_score * 100)|int }}%
+        </div>
+      </div>
+    {% endfor %}
   </div>
   
-  <div class="feedback-form">
-    <h3>Report Feedback</h3>
-    <p>How would you rate the quality of this report?</p>
-    
-    <form id="feedback-form" action="{{ url_for('report_feedback') }}" method="POST">
-      <input type="hidden" name="job_id" value="{{ job.topic.id }}">
-      <input type="hidden" name="rating" id="rating-input" value="0">
-      
-      <div class="rating-stars">
-        <svg class="star" viewBox="0 0 24 24">
-          <path d="M12,17.27L18.18,21L16.54,13.97L22,9.24L14.81,8.62L12,2L9.19,8.62L2,9.24L7.45,13.97L5.82,21L12,17.27Z" />
-        </svg>
-        <svg class="star" viewBox="0 0 24 24">
-          <path d="M12,17.27L18.18,21L16.54,13.97L22,9.24L14.81,8.62L12,2L9.19,8.62L2,9.24L7.45,13.97L5.82,21L12,17.27Z" />
-        </svg>
-        <svg class="star" viewBox="0 0 24 24">
-          <path d="M12,17.27L18.18,21L16.54,13.97L22,9.24L14.81,8.62L12,2L9.19,8.62L2,9.24L7.45,13.97L5.82,21L12,17.27Z" />
-        </svg>
-        <svg class="star" viewBox="0 0 24 24">
-          <path d="M12,17.27L18.18,21L16.54,13.97L22,9.24L14.81,8.62L12,2L9.19,8.62L2,9.24L7.45,13.97L5.82,21L12,17.27Z" />
-        </svg>
-        <svg class="star" viewBox="0 0 24 24">
-          <path d="M12,17.27L18.18,21L16.54,13.97L22,9.24L14.81,8.62L12,2L9.19,8.62L2,9.24L7.45,13.97L5.82,21L12,17.27Z" />
-        </svg>
-      </div>
-      
-      <div>
-        <label for="feedback-comments">Additional Feedback</label>
-        <textarea id="feedback-comments" name="comments" placeholder="Please share any specific feedback to improve our research..."></textarea>
-      </div>
-      
-      <button type="submit">Submit Feedback</button>
-    </form>
+  <div class="action-buttons">
+    <a href="{{ url_for('new_research_request') }}" class="action-button">New Research</a>
+    <a href="{{ url_for('completed_reports') }}" class="action-button secondary">View All Reports</a>
   </div>
 </section>
-{% endblock %}
-
-{% block extra_js %}
-<script>
-  document.addEventListener('DOMContentLoaded', function() {
-    submitFeedback('feedback-form');
-  });
-</script>
 {% endblock %}
