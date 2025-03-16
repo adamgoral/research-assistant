@@ -1,0 +1,46 @@
+flowchart TD
+    User(User) --> InputHandler(Input Handler)
+    
+    subgraph "Core Agent Components"
+        InputHandler --> TaskPlanner(Task Planner)
+        TaskPlanner --> ResearchManager(Research Manager)
+        
+        subgraph "Research Pipeline"
+            ResearchManager --> WebSearch(Web Search Tool)
+            WebSearch --> ContentRetrieval(Content Retrieval)
+            ContentRetrieval --> InfoExtraction(Information Extraction)
+            InfoExtraction --> SourceEvaluation(Source Evaluation)
+        end
+        
+        ResearchManager --> KnowledgeBase[(Knowledge Base)]
+        KnowledgeBase <--> InfoExtraction
+        
+        ResearchManager --> ReportGenerator(Report Generator)
+        ReportGenerator --> CitationManager(Citation Manager)
+        KnowledgeBase --> ReportGenerator
+        SourceEvaluation --> CitationManager
+    end
+    
+    ReportGenerator --> OutputFormatter(Output Formatter)
+    OutputFormatter --> User
+    
+    subgraph "Memory Systems"
+        EphemeralMemory[(Ephemeral Memory)]
+        PersistentMemory[(Persistent Memory)]
+    end
+    
+    TaskPlanner <--> EphemeralMemory
+    ResearchManager <--> EphemeralMemory
+    ReportGenerator <--> EphemeralMemory
+    KnowledgeBase <--> PersistentMemory
+    
+    subgraph "Monitoring & Safety"
+        SafetyLayer(Safety Layer)
+        ProgressMonitor(Progress Monitor)
+    end
+    
+    SafetyLayer --> InputHandler
+    SafetyLayer --> OutputFormatter
+    ProgressMonitor <--> ResearchManager
+    ProgressMonitor <--> ReportGenerator
+    ProgressMonitor --> User

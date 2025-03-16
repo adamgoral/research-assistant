@@ -1,0 +1,59 @@
+# Cline Rules: Web Research Assistant & Report Writer
+
+This file captures important patterns, preferences, and project intelligence that help me work more effectively with this project.
+
+## Project Structure
+
+- The project follows a modular architecture with distinct components organized in a pipeline pattern
+- Core components include: Input Handler, Task Planner, Research Manager, Knowledge Base, and Report Generator
+- The system employs dual memory systems: Ephemeral Memory (short-term) and Persistent Memory (long-term)
+- Safety Layer acts as a cross-cutting concern that enforces guardrails across the system
+
+## Technical Patterns
+
+- Python 3.10+ is the primary implementation language
+- GPT-4o is the primary LLM with specialized configurations for different tasks
+- ChromaDB is used for vector storage and semantic search
+- MongoDB is used for document storage
+- The system is containerized using Docker for deployment
+- FastAPI/Flask is used for API and web services
+
+## Project Guidelines
+
+- Maintain modular architecture with high cohesion and low coupling
+- Follow PEP 8 standards for Python code
+- Include type annotations for all functions
+- Ensure 80%+ test coverage
+- Document all code with comprehensive docstrings
+- Balance research quality with the 15-minute time constraint
+
+## Memory Bank Usage
+
+- Review ALL memory bank files at the start of EVERY task
+- Pay special attention to activeContext.md and progress.md for current state
+- Update memory bank files when:
+  1. Discovering new project patterns
+  2. After implementing significant changes
+  3. When context needs clarification
+- Keep .clinerules updated with new learned patterns
+
+## Current Workflow Patterns
+
+- The project is in the design and architecture phase
+- Initial prototyping focuses on memory system, planning module, and research pipeline
+- Development prioritizes core functionality before UI/UX refinements
+- Component development follows a test-driven approach where possible
+
+## Key Project Decisions
+
+- Using GPT-4o as primary LLM with GPT-3.5 Turbo for search query generation
+- Starting with SerpAPI for search, with Playwright for content extraction
+- Using ChromaDB for semantic storage, MongoDB for structured data
+- Docker Compose for development, planning for AWS deployment
+
+## Important Considerations
+
+- Research quality vs. time constraint (15-minute target) is a key balance
+- Source credibility evaluation is critical for trustworthy results
+- The system must handle contradictory information from different sources
+- Progress visibility to users during long-running research tasks is important

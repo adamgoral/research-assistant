@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Research Assistant</title>
+  <style>
+    :root {
+      --primary: #4361ee;
+      --primary-light: #4895ef;
+      --primary-dark: #3f37c9;
+      --secondary: #4cc9f0;
+      --text-dark: #212529;
+      --text-light: #e9ecef;
+      --bg-light: #f8f9fa;
+      --bg-dark: #343a40;
+      --success: #4caf50;
+      --warning: #ff9800;
+      --danger: #f44336;
+      --border: #dee2e6;
+    }
+    
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      line-height: 1.6;
+      color: var(--text-dark);
+      background-color: var(--bg-light);
+    }
+    
+    header {
+      background-color: white;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-weight: bold;
+      font-size: 1.25rem;
+      color: var(--primary-dark);
+    }
+    
+    .logo svg {
+      width: 24px;
+      height: 24px;
+      fill: var(--primary);
+    }
+    
+    main {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+    
+    .dashboard {
+      display: grid;
+      grid-template-columns: 3fr 1fr;
+      gap: 2rem;
+    }
+    
+    .research-form {
+      background-color: white;
+      border-radius: 8px;
+      padding: 2rem;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    }
+    
+    h1, h2, h3 {
+      margin-bottom: 1rem;
+      color: var(--primary-dark);
+    }
+    
+    label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 500;
+    }
+    
+    input[type="text"],
+    textarea,
+    select {
+      width: 100%;
+      padding: 0.75rem;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      margin-bottom: 1.5rem;
+      font-family: inherit;
+      font-size: 1rem;
+    }
+    
+    textarea {
+      min-height: 100px;
+      resize: vertical;
+    }
+    
+    .parameters {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+    
+    button {
+      background-color: var(--primary);
+      color: white;
+      border: none;
+      border-radius: 4px;
+      padding: 0.75rem 1.5rem;
+      font-size: 1rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+    
+    button:hover {
+      background-color: var(--primary-dark);
+    }
+    
+    .recent-reports {
+      background-color: white;
+      border-radius: 8px;
+      padding: 1.5rem;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    }
+    
+    .report-item {
+      padding: 1rem 0;
+      border-bottom: 1px solid var(--border);
+    }
+    
+    .report-item:last-child {
+      border-bottom: none;
+    }
+    
+    .report-title {
+      font-weight: 500;
+      margin-bottom: 0.25rem;
+    }
+    
+    .report-meta {
+      font-size: 0.875rem;
+      color: #6c757d;
+    }
+    
+    .tabs {
+      display: flex;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 2rem;
+    }
+    
+    .tab {
+      padding: 0.75rem 1.5rem;
+      cursor: pointer;
+      border-bottom: 3px solid transparent;
+    }
+    
+    .tab.active {
+      border-bottom-color: var(--primary);
+      font-weight: 500;
+    }
+    
+    .progress-container {
+      margin-top: 2rem;
+    }
+    
+    .progress-bar {
+      height: 8px;
+      background-color: #e9ecef;
+      border-radius: 4px;
+      overflow: hidden;
+      margin-bottom: 0.5rem;
+    }
+    
+    .progress-fill {
+      height: 100%;
+      background-color: var(--primary);
+      border-radius: 4px;
+      width: 25%;
+    }
+    
+    .progress-status {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.875rem;
+      color: #6c757d;
+    }
+    
+    .status-indicator {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem 1rem;
+      border-radius: 4px;
+      background-color: rgba(76, 201, 240, 0.1);
+      margin-bottom: 1rem;
+    }
+    
+    .status-indicator.active {
+      background-color: rgba(76, 201, 240, 0.2);
+      border-left: 3px solid var(--secondary);
+    }
+    
+    .results-view {
+      background-color: white;
+      border-radius: 8px;
+      padding: 2rem;
+      margin-top: 2rem;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    }
+    
+    .source-list {
+      margin-top: 1rem;
+    }
+    
+    .source-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 1rem;
+      padding: 1rem;
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      margin-bottom: 1rem;
+    }
+    
+    .source-rating {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-width: 60px;
+    }
+    
+    .rating-value {
+      font-size: 1.25rem;
+      font-weight: bold;
+      color: var(--primary);
+    }
+    
+    .rating-label {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      color: #6c757d;
+    }
+    
+    .source-content h4 {
+      margin-bottom: 0.5rem;
+    }
+    
+    .source-url {
+      font-size: 0.875rem;
+      color: var(--primary);
+      margin-bottom: 0.5rem;
+      display: block;
+    }
+    
+    .source-snippet {
+      font-size: 0.9375rem;
+      margin-bottom: 0.5rem;
+    }
+    
+    .source-meta {
+      display: flex;
+      gap: 1rem;
+      font-size: 0.8125rem;
+      color: #6c757d;
+    }
+    
+    .badge {
+      display: inline-block;
+      padding: 0.25em 0.6em;
+      font-size: 0.75rem;
+      font-weight: 500;
+      border-radius: 10px;
+      margin-right: 0.5rem;
+    }
+    
+    .badge-blue {
+      background-color: rgba(67, 97, 238, 0.1);
+      color: var(--primary);
+    }
+    
+    .badge-green {
+      background-color: rgba(76, 175, 80, 0.1);
+      color: var(--success);
+    }
+    
+    .badge-orange {
+      background-color: rgba(255, 152, 0, 0.1);
+      color: var(--warning);
+    }
+    
+    .badge-red {
+      background-color: rgba(244, 67, 54, 0.1);
+      color: var(--danger);
+    }
+    
+    .action-buttons {
+      display: flex;
+      gap: 0.5rem;
+      margin-top: 1rem;
+    }
+    
+    .btn-secondary {
+      background-color: white;
+      color: var(--primary);
+      border: 1px solid var(--primary);
+    }
+    
+    .btn-secondary:hover {
+      background-color: rgba(67, 97, 238, 0.05);
+    }
+    
+    .report-container {
+      background-color: white;
+      border-radius: 8px;
+      padding: 2rem;
+      margin-top: 2rem;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    }
+    
+    .report-header {
+      margin-bottom: 2rem;
+    }
+    
+    .report-metadata {
+      display: flex;
+      gap: 2rem;
+      margin-top: 1rem;
+      color: #6c757d;
+      font-size: 0.875rem;
+    }
+    
+    .report-section {
+      margin-bottom: 2rem;
+    }
+    
+    .report-section h3 {
+      margin-bottom: 1rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid var(--border);
+    }
+    
+    .source-citation {
+      font-size: 0.875rem;
+      color: #6c757d;
+      margin-top: 0.5rem;
+    }
+    
+    .export-options {
+      display: flex;
+      gap: 0.5rem;
+      margin-top: 2rem;
+    }
+    
+    .feedback-form {
+      margin-top: 2rem;
+      padding-top: 2rem;
+      border-top: 1px solid var(--border);
+    }
+    
+    .rating-stars {
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+    }
+    
+    .star {
+      cursor: pointer;
+      width: 24px;
+      height: 24px;
+      fill: #e9ecef;
+    }
+    
+    .star.filled {
+      fill: #ffc107;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="logo">
+      <svg viewBox="0 0 24 24">
+        <path d="M9.5,3A6.5,6.5 0 0,1 16,9.5C16,11.11 15.41,12.59 14.44,13.73L14.71,14H15.5L20.5,19L19,20.5L14,15.5V14.71L13.73,14.44C12.59,15.41 11.11,16 9.5,16A6.5,6.5 0 0,1 3,9.5A6.5,6.5 0 0,1 9.5,3M9.5,5C7,5 5,7 5,9.5C5,12 7,14 9.5,14C12,14 14,12 14,9.5C14,7 12,5 9.5,5Z" />
+      </svg>
+      <span>Research Assistant</span>
+    </div>
+    <div>
+      <button class="btn-secondary">Help</button>
+    </div>
+  </header>
+  
+  <main>
+    <div class="tabs">
+      <div class="tab active">New Research</div>
+      <div class="tab">Active Research</div>
+      <div class="tab">Completed Reports</div>
+    </div>
+    
+    <div class="dashboard">
+      <div>
+        <section class="research-form">
+          <h2>Research Request</h2>
+          <form>
+            <div>
+              <label for="research-topic">Research Topic or Question</label>
+              <textarea id="research-topic" placeholder="Enter a specific research topic or question..."></textarea>
+            </div>
+            
+            <div class="parameters">
+              <div>
+                <label for="audience">Target Audience</label>
+                <select id="audience">
+                  <option value="general">General Audience</option>
+                  <option value="academic">Academic</option>
+                  <option value="professional">Professional</option>
+                  <option value="technical">Technical</option>
+                </select>
+              </div>
+              
+              <div>
+                <label for="depth">Research Depth</label>
+                <select id="depth">
+                  <option value="brief">Brief Overview</option>
+                  <option value="standard" selected>Standard</option>
+                  <option value="comprehensive">Comprehensive</option>
+                  <option value="expert">Expert Analysis</option>
+                </select>
+              </div>
+              
+              <div>
+                <label for="format">Report Format</label>
+                <select id="format">
+                  <option value="summary">Executive Summary</option>
+                  <option value="report" selected>Standard Report</option>
+                  <option value="analysis">Analytical Report</option>
+                  <option value="presentation">Presentation</option>
+                </select>
+              </div>
+              
+              <div>
+                <label for="time">Time Constraint</label>
+                <select id="time">
+                  <option value="15">Quick (15 min)</option>
+                  <option value="30" selected>Standard (30 min)</option>
+                  <option value="60">Thorough (1 hour)</option>
+                  <option value="120">Comprehensive (2 hours)</option>
+                </select>
+              </div>
+            </div>
+            
+            <button type="submit">Start Research</button>
+          </form>
+        </section>
+        
+        <section class="progress-container">
+          <h3>Research Progress</h3>
+          
+          <div class="status-indicator">
+            <span>Status: Planning research approach</span>
+          </div>
+          
+          <div class="progress-bar">
+            <div class="progress-fill" style="width: 25%;"></div>
+          </div>
+          
+          <div class="progress-status">
+            <span>25% Complete</span>
+            <span>Est. completion: 12 minutes</span>
+          </div>
+          
+          <div class="status-indicator active">
+            <span>Planning</span>
+          </div>
+          
+          <div class="status-indicator">
+            <span>Searching</span>
+          </div>
+          
+          <div class="status-indicator">
+            <span>Analyzing</span>
+          </div>
+          
+          <div class="status-indicator">
+            <span>Synthesizing</span>
+          </div>
+          
+          <div class="status-indicator">
+            <span>Report Generation</span>
+          </div>
+        </section>
+      </div>
+      
+      <div>
+        <section class="recent-reports">
+          <h3>Recent Reports</h3>
+          
+          <div class="report-item">
+            <div class="report-title">Impact of Remote Work on Urban Development</div>
+            <div class="report-meta">2 hours ago · Standard Report</div>
+          </div>
+          
+          <div class="report-item">
+            <div class="report-title">Renewable Energy Trends 2025</div>
+            <div class="report-meta">Yesterday · Comprehensive</div>
+          </div>
+          
+          <div class="report-item">
+            <div class="report-title">AI Regulation Frameworks</div>
+            <div class="report-meta">3 days ago · Analysis</div>
+          </div>
+          
+          <div class="report-item">
+            <div class="report-title">Global Supply Chain Resilience</div>
+            <div class="report-meta">1 week ago · Executive Summary</div>
+          </div>
+        </section>
+      </div>
+    </div>
+    
+    <section class="results-view">
+      <h3>Research Sources</h3>
+      <p>Top sources related to "Impact of AI on Healthcare Systems"</p>
+      
+      <div class="source-list">
+        <div class="source-item">
+          <div class="source-rating">
+            <div class="rating-value">92</div>
+            <div class="rating-label">Relevance</div>
+          </div>
+          
+          <div class="source-content">
+            <h4>AI in Healthcare: Transforming Patient Care and Hospital Operations</h4>
+            <a href="#" class="source-url">healthtech.org/research/ai-healthcare-transformation-2025</a>
+            <p class="source-snippet">
+              Recent advances in AI have fundamentally changed healthcare delivery models. Studies show that AI-enabled diagnostic systems can improve accuracy by up to 30% while reducing costs by 25%.
+            </p>
+            <div class="source-meta">
+              <span>HealthTech Research Institute</span>
+              <span>Published: Jan 12, 2025</span>
+            </div>
+            <div>
+              <span class="badge badge-green">High Authority</span>
+              <span class="badge badge-blue">Recent</span>
+              <span class="badge badge-blue">Primary Research</span>
+            </div>
+          </div>
+        </div>
+        
+        <div class="source-item">
+          <div class="source-rating">
+            <div class="rating-value">85</div>
+            <div class="rating-label">Relevance</div>
+          </div>
+          
+          <div class="source-content">
+            <h4>Economic Impact Assessment: AI in Global Healthcare Systems</h4>
+            <a href="#" class="source-url">who.int/publications/ai-economic-impact-assessment</a>
+            <p class="source-snippet">
+              Our comprehensive analysis of 42 countries shows significant variability in AI adoption rates across healthcare systems, with estimated cost savings ranging from 15-40% depending on infrastructure readiness.
+            </p>
+            <div class="source-meta">
+              <span>World Health Organization</span>
+              <span>Published: Nov 30, 2024</span>
+            </div>
+            <div>
+              <span class="badge badge-green">High Authority</span>
+              <span class="badge badge-blue">Recent</span>
+              <span class="badge badge-green">Comprehensive</span>
+            </div>
+          </div>
+        </div>
+        
+        <div class="source-item">
+          <div class="source-rating">
+            <div class="rating-value">78</div>
+            <div class="rating-label">Relevance</div>
+          </div>
+          
+          <div class="source-content">
+            <h4>Ethical Considerations in Healthcare AI Deployment</h4>
+            <a href="#" class="source-url">medicalethics.edu/journals/ai-ethics-healthcare</a>
+            <p class="source-snippet">
+              While AI promises significant benefits, our review identifies critical ethical challenges including algorithmic bias, privacy concerns, and the changing doctor-patient relationship that must be addressed.
+            </p>
+            <div class="source-meta">
+              <span>Journal of Medical Ethics</span>
+              <span>Published: Aug 15, 2024</span>
+            </div>
+            <div>
+              <span class="badge badge-green">Peer-Reviewed</span>
+              <span class="badge badge-orange">Alternative Perspective</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="action-buttons">
+        <button>View All Sources</button>
+        <button class="btn-secondary">Refine Search</button>
+      </div>
+    </section>
+    
+    <section class="report-container">
+      <div class="report-header">
+        <h2>Impact of AI on Healthcare Systems</h2>
+        <div class="report-metadata">
+          <div>Generated: March 7, 2025</div>
+          <div>Research Depth: Comprehensive</div>
+          <div>Sources: 23</div>
+        </div>
+      </div>
+      
+      <div class="report-section">
+        <h3>Executive Summary</h3>
+        <p>
+          Artificial Intelligence is fundamentally transforming healthcare systems worldwide, with impacts spanning diagnostics, treatment planning, operational efficiency, and patient experience. This report synthesizes findings from 23 high-quality sources to provide a comprehensive analysis of current impacts, adoption challenges, and future trajectories. Key findings indicate that AI-enabled healthcare systems are achieving 15-40% cost reductions while improving diagnostic accuracy by 20-30% across multiple specialties. However, implementation challenges including regulatory uncertainty, integration with legacy systems, and workforce adaptation remain significant barriers to adoption.
+        </p>
+      </div>
+      
+      <div class="report-section">
+        <h3>Key Findings</h3>
+        <p>
+          The research identified four primary areas where AI is creating significant impact in healthcare systems:
+        </p>
+        <ol>
+          <li>
+            <strong>Diagnostic Enhancement:</strong> AI algorithms are demonstrating superior accuracy in image-based diagnostics, particularly in radiology, dermatology, and pathology, with improvements of 20-30% over traditional methods.
+            <div class="source-citation">[Source: HealthTech Research Institute, 2025; Stanford Medical AI Lab, 2024]</div>
+          </li>
+          <li>
+            <strong>Operational Efficiency:</strong> Predictive analytics for patient flow, resource allocation, and supply chain management are reducing operational costs by 15-25% in early adopter hospitals.
+            <div class="source-citation">[Source: WHO Economic Impact Assessment, 2024; Healthcare Management Review, 2025]</div>
+          </li>
+          <li>
+            <strong>Treatment Personalization:</strong> AI-driven analysis of patient data is enabling more personalized treatment plans, resulting in 15% better outcomes in clinical trials for complex conditions.
+            <div class="source-citation">[Source: Journal of Personalized Medicine, 2024; Global Health Innovation Center, 2025]</div>
+          </li>
+          <li>
+            <strong>Accessibility Improvements:</strong> Telehealth integrated with AI triage systems is expanding healthcare access to underserved regions, with rural patients seeing average diagnosis time reductions of 45%.
+            <div class="source-citation">[Source: Rural Health Association Data Report, 2024; Lancet Digital Health, 2025]</div>
+          </li>
+        </ol>
+      </div>
+      
+      <div class="export-options">
+        <button>Download Full Report (PDF)</button>
+        <button class="btn-secondary">Export as Word</button>
+        <button class="btn-secondary">Share Report</button>
+      </div>
+      
+      <div class="feedback-form">
+        <h3>Report Feedback</h3>
+        <p>How would you rate the quality of this report?</p>
+        
+        <div class="rating-stars">
+          <svg class="star filled" viewBox="0 0 24 24">
+            <path d="M12,17.27L18.18,21L16.54,13.97L22,9.24L14.81,8.62L12,2L9.19,8.62L2,9.24L7.45,13.97L5.82,21L12,17.27Z" />
+          </svg>
+          <svg class="star filled" viewBox="0 0 24 24">
+            <path d="M12,17.27L18.18,21L16.54,13.97L22,9.24L14.81,8.62L12,2L9.19,8.62L2,9.24L7.45,13.97L5.82,21L12,17.27Z" />
+          </svg>
+          <svg class="star filled" viewBox="0 0 24 24">
+            <path d="M12,17.27L18.18,21L16.54,13.97L22,9.24L14.81,8.62L12,2L9.19,8.62L2,9.24L7.45,13.97L5.82,21L12,17.27Z" />
+          </svg>
+          <svg class="star filled" viewBox="0 0 24 24">
+            <path d="M12,17.27L18.18,21L16.54,13.97L22,9.24L14.81,8.62L12,2L9.19,8.62L2,9.24L7.45,13.97L5.82,21L12,17.27Z" />
+          </svg>
+          <svg class="star" viewBox="0 0 24 24">
+            <path d="M12,17.27L18.18,21L16.54,13.97L22,9.24L14.81,8.62L12,2L9.19,8.62L2,9.24L7.45,13.97L5.82,21L12,17.27Z" />
+          </svg>
+        </div>
+        
+        <div>
+          <label for="feedback-comments">Additional Feedback</label>
+          <textarea id="feedback-comments" placeholder="Please share any specific feedback to improve our research..."></textarea>
+        </div>
+        
+        <button>Submit Feedback</button>
+      </div>
+    </section>
+  </main>
+</body>
+</html>
