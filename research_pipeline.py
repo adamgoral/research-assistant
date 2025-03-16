@@ -24,6 +24,17 @@ from datetime import datetime
 from enum import Enum
 from typing import Any, Dict, List, Optional, Set, Tuple, Union
 
+# Import the real WebSearchTool implementation
+# This is imported conditionally to avoid issues if dependencies are not installed
+try:
+    from web_search import WebSearchTool as RealWebSearchTool
+    REAL_SEARCH_AVAILABLE = True
+except ImportError:
+    REAL_SEARCH_AVAILABLE = False
+    logging.getLogger("research_pipeline").warning(
+        "Real web search functionality not available. Using mock implementation instead."
+    )
+
 from pydantic import BaseModel, Field
 
 # Configure logging
@@ -545,10 +556,27 @@ class ResearchPipeline:
     Main research pipeline that orchestrates the research process.
     """
     
-    def __init__(self):
-        """Initialize the research pipeline components."""
+    def __init__(self, use_real_search: bool = True, api_key: Optional[str] = None):
+        """
+        Initialize the research pipeline components.
+        
+        Args:
+            use_real_search: Whether to use real web search when available
+            api_key: SerpAPI key for real web search (if None, will try to get from environment)
+        """
         self.query_generator = SearchQueryGenerator()
-        self.web_search = WebSearchTool()
+        
+        # Use real web search implementation if available and requested
+        if use_real_search and REAL_SEARCH_AVAILABLE:
+            logger.info("Using real web search implementation with SerpAPI")
+            self.web_search = RealWebSearchTool(api_key=api_key)
+        else:
+            if use_real_search and not REAL_SEARCH_AVAILABLE:
+                logger.warning("Real web search requested but not available. Using mock implementation.")
+            else:
+                logger.info("Using mock web search implementation")
+            self.web_search = WebSearchTool()
+            
         self.content_retriever = ContentRetriever()
         self.information_extractor = InformationExtractor()
         self.source_evaluator = SourceEvaluator()
@@ -697,6 +725,9 @@ async def main():
     print("Research Pipeline PoC Demo")
     print("-" * 50)
     
+    # Get API key from environment (if available)
+    api_key = os.environ.get("SERPAPI_API_KEY")
+    
     # Create a research topic
     topic = ResearchTopic(
         id="topic_001",
@@ -709,8 +740,23 @@ async def main():
     print(f"Keywords: {', '.join(topic.keywords)}")
     print("-" * 50)
     
+    # Determine search type
+    use_real_search = REAL_SEARCH_AVAILABLE and api_key is not None
+    search_type = "real" if use_real_search else "mock"
+    
+    print(f"Using {search_type} web search implementation")
+    if search_type == "real":
+        print("SerpAPI key found in environment")
+    else:
+        if REAL_SEARCH_AVAILABLE and api_key is None:
+            print("SerpAPI key not found. Set SERPAPI_API_KEY environment variable to use real search.")
+        elif not REAL_SEARCH_AVAILABLE:
+            print("Real search dependencies not available. Install required packages to use real search.")
+    
+    print("-" * 50)
+    
     # Create and execute the research pipeline
-    pipeline = ResearchPipeline()
+    pipeline = ResearchPipeline(use_real_search=use_real_search, api_key=api_key)
     
     print("Executing research pipeline...")
     stats = await pipeline.research_topic(topic)
